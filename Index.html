@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Everyday Preferences Assessment</title>
+  <title>Everyday Social & Lifestyle Preferences Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
   <style>
@@ -17,27 +17,27 @@
     <!-- Header -->
     <div class="text-center mb-12">
       <div class="inline-flex items-center gap-3 mb-2">
-        <div class="w-9 h-9 bg-emerald-600 rounded-2xl flex items-center justify-center text-xl">📋</div>
-        <h1 class="heading text-5xl font-semibold tracking-tighter text-white">Everyday Preferences Assessment</h1>
+        <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center text-xl">📋</div>
+        <h1 class="heading text-5xl font-semibold tracking-tighter text-white">Everyday Social & Lifestyle Preferences Quiz</h1>
       </div>
-      <p class="text-zinc-400 text-lg">A brief survey about common daily choices and habits</p>
-      <p class="text-xs text-zinc-500 mt-3">Questions generated live via Groq</p>
+      <p class="text-zinc-400 text-lg">Quick 10-question survey about daily habits, tastes, and social vibes</p>
+      <p class="text-xs text-zinc-500 mt-3">Questions generated live</p>
     </div>
 
     <!-- Start Button -->
     <div class="text-center mb-10">
       <button onclick="generateQuestions()"
-              class="bg-emerald-600 hover:bg-emerald-500 px-12 py-5 rounded-3xl font-semibold text-lg transition">
-        Start Assessment
+              class="bg-blue-600 hover:bg-blue-500 px-12 py-5 rounded-3xl font-semibold text-lg transition">
+        Start Quiz
       </button>
-      <p class="text-xs text-zinc-500 mt-4">Click to generate your unique questions</p>
+      <p class="text-xs text-zinc-500 mt-4">Click to get your personalized questions</p>
     </div>
 
     <!-- Loading -->
     <div id="loading" class="hidden text-center py-20">
       <div class="inline-flex flex-col items-center">
-        <div class="w-8 h-8 border-4 border-zinc-700 border-t-emerald-500 rounded-full animate-spin mb-6"></div>
-        <p class="text-zinc-400">Generating questions...</p>
+        <div class="w-8 h-8 border-4 border-zinc-700 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+        <p class="text-zinc-400">Creating questions...</p>
       </div>
     </div>
 
@@ -45,9 +45,9 @@
     <div id="quizContainer" class="hidden">
       <form id="quizForm" class="space-y-8"></form>
       <div class="mt-12 flex justify-center">
-        <button onclick="submitQuiz()"
+        <button type="button" onclick="submitQuiz()"
                 class="bg-white text-zinc-900 hover:bg-zinc-100 px-16 py-5 rounded-3xl font-semibold text-lg transition">
-          Complete Assessment
+          Finish Quiz
         </button>
       </div>
     </div>
@@ -59,25 +59,33 @@
         <h2 id="resultTitle" class="heading text-4xl font-semibold text-white"></h2>
       </div>
       <div class="mb-10">
-        <div class="text-6xl font-mono font-bold text-emerald-400" id="scoreDisplay">0/20</div>
-        <p class="text-zinc-400 text-sm tracking-widest uppercase">Preference Alignment Score</p>
+        <div class="text-6xl font-mono font-bold text-blue-400" id="scoreDisplay">0/20</div>
+        <p class="text-zinc-400 text-sm tracking-widest uppercase">Preference Score</p>
       </div>
       <div id="resultText" class="text-zinc-300 text-lg leading-relaxed max-w-md mx-auto"></div>
+      <div id="revealSection" class="mt-10 pt-8 border-t border-zinc-700 hidden">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-4">The Real Purpose of This Quiz</h3>
+        <p class="text-lg mb-6">Surprise — this wasn't just a random lifestyle quiz.<br><br>
+        The questions were subtly designed (with zero direct mentions of dating/attraction) to explore patterns that — according to many fun, unofficial online quizzes over the years — often correlate with sexual orientation.<br><br>
+        Higher scores tend to align with <strong>gay/homosexual</strong> leanings (more expressive, aesthetic, emotionally-attuned choices).<br>
+        Lower scores tend to align with <strong>straight/heterosexual</strong> leanings.<br>
+        Mid-range = balanced / bi / fluid / still figuring it out.<br><br>
+        <strong>This is purely for entertainment & curiosity — not a scientific test.</strong> Real orientation is about who you're actually attracted to romantically/sexually, not a score.</p>
+      </div>
       <div class="mt-12 pt-8 border-t border-zinc-700">
         <button onclick="location.reload()"
                 class="bg-zinc-800 hover:bg-zinc-700 px-8 py-4 rounded-2xl text-sm font-medium">
-          Start Over
+          Take Again
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    const GROQ_API_KEY = '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';  // ← PASTE YOUR REAL GROQ API KEY HERE
+    const GROQ_API_KEY = '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'; // ← REPLACE WITH YOUR REAL KEY
 
     async function generateQuestions() {
       document.getElementById('loading').classList.remove('hidden');
-
       try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
@@ -86,37 +94,32 @@
             'Authorization': `Bearer ${GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',  // fast + strong free-tier model; alternatives: 'mixtral-8x7b-32768', 'gemma2-9b-it'
+            model: 'llama-3.3-70b-versatile',
             messages: [
               {
                 role: 'system',
-                content: `You are an expert professional quiz designer creating a serious "Everyday Preferences Assessment".
-
+                content: `You are a professional quiz creator making a neutral "Everyday Social & Lifestyle Preferences Quiz".
 Generate EXACTLY 10 multiple-choice questions.
-Each question must sound completely neutral, professional, and about ordinary daily life.
-Topics must vary and cover: weekend activities, music taste, live events, career interests, friend groups, morning routines, social gatherings, home environment, emotional responses to media, and how others describe personality.
-
-For each question:
-- 3 options only
-- Option values (hidden from user): 
-  - value 0 = practical, low-maintenance, traditional preference
-  - value 1 = average, balanced preference  
-  - value 2 = highly aesthetic, expressive, detail-oriented preference
-
-Output ONLY a clean JSON array. No explanations, no markdown, no code blocks, no extra text.
-
-Example format:
+Each must sound 100% neutral, professional, everyday — NO mention of dating, attraction, gender, romance, kissing, crushes, etc.
+Cover varied topics: weekend plans, music/film tastes, social events, career vibes, friend dynamics, morning habits, home style, emotional reactions to stories/media, self-image as described by others, hobbies.
+Each question: exactly 3 options.
+Hidden values (0–2):
+- 0 = more stereotypically "straight-coded" / conventional / low-aesthetic response
+- 1 = neutral / average / balanced
+- 2 = more stereotypically "gay-coded" / expressive / aesthetic / emotionally-detailed response
+Output ONLY a clean JSON array of objects. Nothing else.
+Example structure:
 [
   {
     "number": 1,
-    "question": "On a typical free Saturday afternoon you most enjoy...",
+    "question": "How do you usually spend a free weekend morning?",
     "options": [
-      {"text": "Working on home repairs or outdoor projects", "value": 0},
-      {"text": "Watching shows or playing video games", "value": 1},
-      {"text": "Browsing shops or exploring design inspiration", "value": 2}
+      {"text": "Gym or outdoor workout then chores", "value": 0},
+      {"text": "Coffee and scrolling social media/news", "value": 1},
+      {"text": "Brunch with friends or browsing design/art content", "value": 2}
     ]
   }
-  // 9 more exactly like this
+  // ... exactly 9 more
 ]`
               },
               {
@@ -124,34 +127,28 @@ Example format:
                 content: 'Generate the 10 questions now. Output only the raw JSON array.'
               }
             ],
-            temperature: 0.75,
+            temperature: 0.7,
             max_tokens: 1800
           })
         });
 
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          throw new Error(err.error?.message || `Groq API error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
 
         const data = await response.json();
         let text = data.choices[0].message.content.trim();
-
-        // Clean possible markdown wrappers
         if (text.includes('```')) {
           text = text.split('```')[1]?.replace(/json/i, '').trim() || text;
         }
-
         const questions = JSON.parse(text);
 
         if (!Array.isArray(questions) || questions.length !== 10) {
-          throw new Error('Invalid question format from Groq');
+          throw new Error('Bad format from API');
         }
 
         renderQuestions(questions);
       } catch (err) {
         console.error(err);
-        alert(`Failed to generate questions: ${err.message}\nCheck console or your Groq API key/limits.`);
+        alert(`Error generating questions: ${err.message}\nCheck your Groq key/limits.`);
         document.getElementById('loading').classList.add('hidden');
       }
     }
@@ -159,19 +156,18 @@ Example format:
     function renderQuestions(questions) {
       const form = document.getElementById('quizForm');
       form.innerHTML = '';
-
       questions.forEach((q, i) => {
         const card = document.createElement('div');
         card.className = 'bg-zinc-900 border border-zinc-700 rounded-3xl p-8';
         card.innerHTML = `
           <div class="flex items-start gap-5">
-            <div class="w-8 h-8 bg-zinc-800 text-emerald-400 rounded-2xl flex items-center justify-center font-mono text-lg shrink-0">${q.number}</div>
+            <div class="w-8 h-8 bg-zinc-800 text-blue-400 rounded-2xl flex items-center justify-center font-mono text-lg shrink-0">${q.number}</div>
             <div class="flex-1">
               <p class="text-lg leading-tight">${q.question}</p>
               <div class="mt-7 space-y-3">
                 ${q.options.map(opt => `
                   <label class="option flex items-center gap-4 bg-zinc-800 border border-transparent hover:border-zinc-600 rounded-2xl px-6 py-5 cursor-pointer transition">
-                    <input type="radio" name="q${i}" value="${opt.value}" class="w-5 h-5 accent-emerald-500">
+                    <input type="radio" name="q${i}" value="${opt.value}" class="w-5 h-5 accent-blue-500">
                     <span>${opt.text}</span>
                   </label>
                 `).join('')}
@@ -181,7 +177,6 @@ Example format:
         `;
         form.appendChild(card);
       });
-
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('quizContainer').classList.remove('hidden');
       window.scrollTo({ top: 400, behavior: 'smooth' });
@@ -190,44 +185,44 @@ Example format:
     function submitQuiz() {
       let score = 0;
       let answered = 0;
-
       for (let i = 0; i < 10; i++) {
         const radios = document.getElementsByName(`q${i}`);
+        let selected = false;
         for (let r of radios) {
           if (r.checked) {
             score += parseInt(r.value);
             answered++;
+            selected = true;
             break;
           }
         }
-      }
-
-      if (answered < 10) {
-        alert("Please answer all 10 questions.");
-        return;
+        if (!selected) {
+          alert("Please answer all questions.");
+          return;
+        }
       }
 
       document.getElementById('scoreDisplay').textContent = `${score}/20`;
 
-      let title, text, emoji;
-
-      if (score <= 6) {
-        title = "Practical & Grounded";
-        text = "Your preferences lean toward efficiency, functionality, and straightforward routines.";
-        emoji = "⚙️";
-      } else if (score <= 13) {
-        title = "Balanced & Versatile";
-        text = "You show a healthy mix of practical and more expressive tendencies.";
-        emoji = "⚖️";
+      let title, text, emoji, showReveal = true;
+      if (score <= 7) {
+        title = "Conventional & Straightforward";
+        text = "Your preferences lean toward classic, practical, no-fuss choices in daily life.";
+        emoji = "⚽";
+      } else if (score <= 14) {
+        title = "Balanced Mix";
+        text = "You blend practical habits with some expressive and detail-oriented tendencies.";
+        emoji = "🌈";
       } else {
-        title = "Aesthetic & Expressive";
-        text = "Your choices reflect strong attention to detail, personal style, emotional depth, and creative presentation.";
-        emoji = "🌟";
+        title = "Expressive & Stylized";
+        text = "Your choices show strong aesthetic sense, emotional depth, creativity, and personal flair.";
+        emoji = "✨";
       }
 
       document.getElementById('resultEmoji').textContent = emoji;
       document.getElementById('resultTitle').textContent = title;
       document.getElementById('resultText').innerHTML = text;
+      document.getElementById('revealSection').classList.remove('hidden');
 
       document.getElementById('quizContainer').classList.add('hidden');
       document.getElementById('result').classList.remove('hidden');
